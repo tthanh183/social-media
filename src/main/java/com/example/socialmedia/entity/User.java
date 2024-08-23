@@ -6,6 +6,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,13 +15,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Document(collection = "notifications")
-public class Notifications {
+@Document(collection = "users")
+public class User {
     @Id
     ObjectId id;
-    String title;
-    String content;
-    ObjectId userId;
-    boolean isRead;
+    String name;
+    String email;
+    String password;
+    String bio;
+    LocalDate dob;
+    List<String> link;
+    String profilePictureUrl;
+    boolean isDeleted;
+    boolean isPrivate;
     LocalDateTime createdAt;
 }
