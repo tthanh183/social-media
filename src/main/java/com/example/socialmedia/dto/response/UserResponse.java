@@ -1,9 +1,8 @@
-package com.example.socialmedia.entity;
+package com.example.socialmedia.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.bson.types.ObjectId;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,13 +13,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Document(collection = "users")
-public class User {
-    @Id
+public class UserResponse {
     String id;
     String name;
     String email;
-    String password;
     String bio;
     LocalDate dob;
     List<String> link;

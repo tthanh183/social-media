@@ -2,7 +2,6 @@ package com.example.socialmedia.entity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,6 +13,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "videos")
 public class Video {
     @Id
-    ObjectId id;
+    String id;
     String url;
 }
