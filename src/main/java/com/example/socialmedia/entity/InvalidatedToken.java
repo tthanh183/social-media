@@ -5,18 +5,18 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
-@Data
 @Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Document(collection = "likes")
-public class Like {
+@Document(collection = "invalid_tokens")
+public class InvalidatedToken {
     @Id
     String id;
-    String userId;
-    String targetId;
-    LocalDateTime createdAt;
+
+    Date expiryTime;
 }

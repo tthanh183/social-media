@@ -2,7 +2,6 @@ package com.example.socialmedia.entity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -17,13 +16,13 @@ import java.util.List;
 @Document(collection = "posts")
 public class Post {
     @Id
-    ObjectId id;
-    ObjectId userId;
+    String id;
+    String userId;
     String caption;
     String content;
     String location;
-    List<ObjectId> images;
-    List<ObjectId> videos;
+    List<String> images;
+    List<String> videos;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     String status;

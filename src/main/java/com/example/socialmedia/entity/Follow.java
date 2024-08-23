@@ -2,7 +2,6 @@ package com.example.socialmedia.entity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,8 +15,8 @@ import java.time.LocalDateTime;
 @Document(collection = "follows")
 public class Follow {
     @Id
-    ObjectId id;
-    ObjectId followerId;
-    ObjectId followingId;
+    String id;
+    String followerId;
+    String followingId;
     LocalDateTime createdAt;
 }
