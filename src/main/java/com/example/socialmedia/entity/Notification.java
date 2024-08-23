@@ -13,11 +13,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Document(collection = "likes")
-public class Likes {
+@Document(collection = "notifications")
+public class Notification {
     @Id
     ObjectId id;
+    String title;
+    String content;
     ObjectId userId;
-    ObjectId targetId;
+    boolean isRead;
     LocalDateTime createdAt;
 }

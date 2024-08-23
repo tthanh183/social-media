@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Document(collection = "follows")
-public class Follows {
+public class Follow {
     @Id
     ObjectId id;
     ObjectId followerId;
