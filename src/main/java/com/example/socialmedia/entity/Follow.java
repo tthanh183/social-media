@@ -17,6 +17,6 @@ public class Follow {
     @Id
     String id;
     String followerId;
-    String followingId;
+    String followeeId;
     LocalDateTime createdAt;
 }

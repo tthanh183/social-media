@@ -13,6 +13,8 @@ public enum ErrorCode {
     PASSWORD_INVALID(1004, "Password must be at least {min} characters", HttpStatus.BAD_REQUEST),
     USER_NOT_EXISTED(1005, "User not existed", HttpStatus.NOT_FOUND),
     UNAUTHENTICATED(1006, "Unauthenticated", HttpStatus.UNAUTHORIZED),
+    CONTENT_VIOLATION(1007, "Content violates policy", HttpStatus.BAD_REQUEST),
+    POST_NOT_EXISTED(1008, "Post not existed", HttpStatus.NOT_FOUND),
     ;
     private int code;
     private String message;
