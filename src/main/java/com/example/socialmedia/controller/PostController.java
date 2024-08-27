@@ -43,10 +43,15 @@ public class PostController {
     }
 
     @GetMapping
-    public ApiResponse<List<PostResponse>> getPosts() {
-        return ApiResponse.<List<PostResponse>>builder().result(postService.getAllPosts()).build();
+    public ApiResponse<List<PostResponse>> getLatestPosts(@RequestParam(defaultValue = "0") int page,
+                                                          @RequestParam(defaultValue = "10") int size) {
+        return ApiResponse.<List<PostResponse>>builder().result(postService.getLatestPosts(page, size)).build();
     }
 
+    @PostMapping("/lists")
+    public ApiResponse<List<PostResponse>> createPosts(@RequestBody List<PostCreationRequest> requests) {
+        return ApiResponse.<List<PostResponse>>builder().result(postService.createPosts(requests)).build();
+    }
 
 }
 

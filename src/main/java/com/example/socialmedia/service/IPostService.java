@@ -12,4 +12,6 @@ public interface IPostService {
     public void deletePost(String postId);
     public PostResponse getPostById(String postId);
     public List<PostResponse> getAllPosts();
+    public List<PostResponse> createPosts(List<PostCreationRequest> requests);
+    public List<PostResponse> getLatestPosts(int page, int size);
 }

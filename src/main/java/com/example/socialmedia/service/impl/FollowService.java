@@ -1,5 +1,7 @@
 package com.example.socialmedia.service.impl;
 
+import com.example.socialmedia.dto.request.FollowRequest;
+import com.example.socialmedia.dto.response.FollowResponse;
 import com.example.socialmedia.entity.Follow;
 import com.example.socialmedia.entity.User;
 import com.example.socialmedia.exception.AppException;
@@ -21,17 +23,21 @@ public class FollowService implements IFollowService {
     IUserRepository userRepository;
 
     @Override
-    public void follow(String followeeId) {
+    public FollowResponse follow(FollowRequest request) {
         var context = SecurityContextHolder.getContext();
         String email = context.getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        Follow follow = followRepository.findByFollowerIdAndFolloweeId(user.getId(), followeeId);
+        Follow follow = followRepository.findByFollowerIdAndFolloweeId(user.getId(), request.getFolloweeId());
+        String status = "";
         if (follow != null) {
             followRepository.deleteById(follow.getId());
+            status = "Unfollow successfully";
         }else {
-            followRepository.save(Follow.builder().followerId(user.getId()).followeeId(followeeId).build());
+            followRepository.save(Follow.builder().followerId(user.getId()).followeeId(request.getFolloweeId()).build());
+            status = "Follow successfully";
         }
+        return FollowResponse.builder().status(status).build();
     }
 
 }

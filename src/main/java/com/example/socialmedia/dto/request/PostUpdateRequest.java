@@ -15,8 +15,9 @@ import java.util.List;
 public class PostUpdateRequest {
     String content;
     String location;
-    List<String> images;
+    List<String> photos;
     List<String> videos;
+    List<String> hashtags;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     String status;
