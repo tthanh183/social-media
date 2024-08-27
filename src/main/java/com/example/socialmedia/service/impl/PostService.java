@@ -4,27 +4,27 @@ import com.example.socialmedia.constant.Constant;
 import com.example.socialmedia.dto.request.PostCreationRequest;
 import com.example.socialmedia.dto.request.PostUpdateRequest;
 import com.example.socialmedia.dto.response.PostResponse;
+import com.example.socialmedia.entity.Follow;
 import com.example.socialmedia.entity.Post;
 import com.example.socialmedia.entity.User;
 import com.example.socialmedia.exception.AppException;
 import com.example.socialmedia.exception.ErrorCode;
 import com.example.socialmedia.mapper.PostMapper;
-import com.example.socialmedia.repository.IPostRepository;
-import com.example.socialmedia.repository.IUserRepository;
+import com.example.socialmedia.repository.*;
 import com.example.socialmedia.service.IPostService;
 import com.example.socialmedia.service.IUserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +35,9 @@ public class PostService implements IPostService {
     IUserService userService;
     PostMapper postMapper;
     RestTemplate restTemplate;
+    IFollowRepository followRepository;
+    ILikeRepository likeRepository;
+    ICommentRepository commentRepository;
 
     @Override
     public PostResponse createPost(PostCreationRequest request) {
@@ -46,7 +49,6 @@ public class PostService implements IPostService {
         Post post = postMapper.createPost(request);
         post.setUserId(user.getId());
         post.setCreatedAt(LocalDateTime.now());
-
 
         return postMapper.toPostResponse(postRepository.save(post));
     }
@@ -70,7 +72,8 @@ public class PostService implements IPostService {
     @Override
     public PostResponse getPostById(String postId) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXISTED));
-
+        post.setLikeCount(likeRepository.countByTargetId(postId));
+        post.setCommentCount(commentRepository.countByPostId(postId));
         return postMapper.toPostResponse(post);
     }
 
@@ -78,6 +81,50 @@ public class PostService implements IPostService {
     public List<PostResponse> getAllPosts() {
         User user = userService.getContextUser();
         List<Post> posts = postRepository.findByUserId(user.getId());
+        posts.forEach(post -> likeRepository.countByTargetId(post.getId()));
+        posts.forEach(post -> commentRepository.countByPostId(post.getId()));
+        return posts.stream().map(postMapper::toPostResponse).toList();
+    }
+
+    @Override
+    public List<PostResponse> getLatestPosts(int page, int size) {
+        User user = userService.getContextUser();
+        List<String> followingIds = followRepository.findByFollowerId(user.getId()).stream()
+                .map(Follow::getFolloweeId)
+                .toList();
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<Post> posts;
+
+        if (followingIds.isEmpty()) {
+            posts = postRepository.findByOrderByCreatedAtDesc(pageable);
+        } else {
+            List<Post> followedPosts = postRepository.findByUserIdInOrderByCreatedAtDesc(followingIds, pageable);
+
+            if (followedPosts.size() < size) {
+                int remainingSize = size - followedPosts.size();
+                int randomPage = (int) (Math.random() * 100); // Generate a random page number
+                Pageable randomPageable = PageRequest.of(randomPage, remainingSize);
+                List<Post> randomPosts = postRepository.findByUserIdNotInOrderByCreatedAtDesc(followingIds, randomPageable);
+                followedPosts.addAll(randomPosts);
+            }
+
+            posts = followedPosts.stream()
+                    .sorted((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()))
+                    .collect(Collectors.toList());
+        }
+
+        return posts.stream().map(postMapper::toPostResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PostResponse> createPosts(List<PostCreationRequest> requests) {
+        User user = userService.getContextUser();
+        List<Post> posts = requests.stream().map(postMapper::createPost).toList();
+        posts.forEach(post -> post.setUserId(user.getId()));
+        posts.forEach(post -> post.setCreatedAt(LocalDateTime.now()));
+
+        postRepository.saveAll(posts);
         return posts.stream().map(postMapper::toPostResponse).toList();
     }
 

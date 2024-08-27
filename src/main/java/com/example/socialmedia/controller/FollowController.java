@@ -1,5 +1,8 @@
 package com.example.socialmedia.controller;
 
+import com.example.socialmedia.dto.request.FollowRequest;
+import com.example.socialmedia.dto.response.ApiResponse;
+import com.example.socialmedia.dto.response.FollowResponse;
 import com.example.socialmedia.service.IFollowService;
 import com.example.socialmedia.service.impl.FollowService;
 import lombok.AccessLevel;
@@ -18,7 +21,7 @@ public class FollowController {
     IFollowService followService;
 
     @PostMapping("")
-    public void follow(@RequestBody String followeeId) {
-        followService.follow(followeeId);
+    public ApiResponse<FollowResponse> follow(@RequestBody FollowRequest request) {
+        return ApiResponse.<FollowResponse>builder().result(followService.follow(request)).build();
     }
 }

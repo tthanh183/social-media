@@ -1,5 +1,8 @@
 package com.example.socialmedia.service;
 
+import com.example.socialmedia.dto.request.FollowRequest;
+import com.example.socialmedia.dto.response.FollowResponse;
+
 public interface IFollowService {
-    public void follow(String followeeId);
+    public FollowResponse follow(FollowRequest request);
 }

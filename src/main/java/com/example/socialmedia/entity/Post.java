@@ -20,9 +20,12 @@ public class Post {
     String userId;
     String content;
     String location;
-    List<String> images;
+    List<String> photos;
     List<String> videos;
+    List<String> hashtags;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     String status;
+    Long likeCount;
+    Long commentCount;
 }
