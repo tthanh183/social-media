@@ -92,30 +92,44 @@ public class PostService implements IPostService {
         List<String> followingIds = followRepository.findByFollowerId(user.getId()).stream()
                 .map(Follow::getFolloweeId)
                 .toList();
-        Pageable pageable = PageRequest.of(page, size);
 
-        List<Post> posts;
+        int followPostSize = (int) (size * 0.6);
+        int randomPostSize = size - followPostSize;
 
-        if (followingIds.isEmpty()) {
-            posts = postRepository.findByOrderByCreatedAtDesc(pageable);
-        } else {
-            List<Post> followedPosts = postRepository.findByUserIdInOrderByCreatedAtDesc(followingIds, pageable);
+        List<Post> posts = new ArrayList<>();
 
-            if (followedPosts.size() < size) {
-                int remainingSize = size - followedPosts.size();
-                int randomPage = (int) (Math.random() * 100); // Generate a random page number
-                Pageable randomPageable = PageRequest.of(randomPage, remainingSize);
-                List<Post> randomPosts = postRepository.findByUserIdNotInOrderByCreatedAtDesc(followingIds, randomPageable);
-                followedPosts.addAll(randomPosts);
-            }
-
-            posts = followedPosts.stream()
-                    .sorted((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()))
-                    .collect(Collectors.toList());
+        if (!followingIds.isEmpty()) {
+            Pageable followPageable = PageRequest.of(page, followPostSize);
+            posts = postRepository.findByUserIdInOrderByCreatedAtDesc(followingIds, followPageable);
         }
 
-        return posts.stream().map(postMapper::toPostResponse).collect(Collectors.toList());
+        int totalPostCount = (int) postRepository.count();
+        int maxPage = totalPostCount / randomPostSize;
+        int randomPage = (int) (Math.random() * maxPage);
+        Pageable randomPageable = PageRequest.of(randomPage, randomPostSize);
+
+        List<Post> randomPosts = postRepository.findByUserIdNotInOrderByCreatedAtDesc(followingIds, randomPageable);
+
+        posts.addAll(randomPosts);
+
+        Collections.shuffle(posts);
+
+        posts = posts.stream()
+                .sorted((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()))
+                .collect(Collectors.toList());
+
+        if (posts.size() > size) {
+            posts = posts.subList(0, size);
+        }
+
+        return posts.stream()
+                .map(postMapper::toPostResponse)
+                .collect(Collectors.toList());
     }
+
+
+
+
 
     @Override
     public List<PostResponse> createPosts(List<PostCreationRequest> requests) {
